@@ -35,7 +35,8 @@ class AccountMoveLine(models.Model):
     def _compute_contribution_price(self):
         for val in self:
             if len(val.sales_users_ids) > 0 and val.price_subtotal > 0:
-                val.contribution_price = val.price_subtotal / len(val.sales_users_ids)
+                val.contribution_price = val.price_subtotal \
+                                         / len(val.sales_users_ids)
 
     @api.depends('product_id', 'company_id', 'currency_id', 'product_uom_id')
     def _compute_cost_price(self):
@@ -84,8 +85,11 @@ class AccountMoveLine(models.Model):
 class AccountMove(models.Model):
     _inherit = "account.move"
 
-    total_sales_margin = fields.Float("Margin", compute='_compute_sales_margin', store=True)
+    total_sales_margin = fields.Float("Margin",
+                                      compute='_compute_sales_margin',
+                                      store=True)
 
     @api.depends('invoice_line_ids.sales_margin', 'amount_untaxed')
     def _compute_sales_margin(self):
-        self.total_sales_margin = sum(self.invoice_line_ids.mapped('sales_margin'))
+        self.total_sales_margin = sum(
+            self.invoice_line_ids.mapped('sales_margin'))
